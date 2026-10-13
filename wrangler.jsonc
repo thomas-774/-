@@ -1,0 +1,9 @@
+// Cloudflare Workers deploy config: serve the static build in dist/ (no Worker code).
+// public/_headers is copied into dist/ and applied to these assets.
+{
+  "name": "philo-registration",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

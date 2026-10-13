@@ -1,0 +1,180 @@
+/* Admin page (/admin) — plan §7. */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--brand-brown);
+  border-bottom: 2px solid var(--brand-ember);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.btn-small {
+  min-height: 40px;
+  padding: 6px 14px;
+}
+
+.admin-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+.login-card {
+  max-width: 420px;
+  margin: 40px auto;
+}
+
+.counters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.counter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.counter-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.counter-value {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--brand-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.capacity-form {
+  margin-bottom: 16px;
+}
+
+.capacity-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.capacity-row {
+  display: flex;
+  gap: 10px;
+  max-width: 360px;
+}
+
+.capacity-row input {
+  flex: 1;
+}
+
+.capacity-result {
+  margin: 10px 0 0;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.capacity-result.is-error {
+  color: var(--error);
+}
+
+.table-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.table-tools .field {
+  margin-bottom: 8px;
+  min-width: 140px;
+}
+
+.table-tools .grow {
+  flex: 1;
+  min-width: 200px;
+}
+
+.table-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 10px;
+  font-size: 14px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: start;
+  border-bottom: 1px solid rgba(255, 178, 23, 0.12);
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+td.num {
+  font-weight: 800;
+  color: var(--brand-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+td.phone {
+  direction: ltr;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.badge-confirmed {
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
+.badge-waiting {
+  background: rgba(206, 79, 21, 0.35);
+  border: 1px solid var(--brand-ember);
+  color: var(--text);
+}
+
+.empty-row td {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px;
+}

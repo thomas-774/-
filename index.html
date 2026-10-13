@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>اجتماع فيلو فاميلي — بحضور الأنبا روفائيل</title>
+    <meta name="description" content="سجّل في اجتماع فيلو فاميلي بحضور الأنبا روفائيل." />
+    <meta name="theme-color" content="#241C17" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="اجتماع فيلو فاميلي — بحضور الأنبا روفائيل" />
+    <meta property="og:description" content="سجّل في الاجتماع من هنا." />
+    <meta property="og:image" content="/brand/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ar_EG" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href="/fonts/cairo-arabic-800-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Hide the form before first paint when a saved registration exists (hash pinned in public/_headers CSP) -->
+    <script>try{if(localStorage.getItem('filo_reg_token'))document.documentElement.classList.add('has-token')}catch(e){}</script>
+
+    <script type="module" src="/src/public/main.ts"></script>
+  </head>
+  <body>
+    <main class="page">
+      <header class="site-header">
+        <img
+          class="logo"
+          src="/brand/logo-160.webp"
+          srcset="/brand/logo-160.webp 160w, /brand/logo-320.webp 320w"
+          sizes="(min-width: 720px) 160px, 120px"
+          width="160"
+          height="160"
+          alt="شعار فيلو فاميلي"
+        />
+        <h1>اجتماع فيلو فاميلي</h1>
+        <p class="subtitle">بحضور الأنبا روفائيل</p>
+      </header>
+
+      <figure class="hero">
+        <img
+          src="/brand/anba-rofail-720.webp"
+          srcset="/brand/anba-rofail-360.webp 360w, /brand/anba-rofail-720.webp 720w, /brand/anba-rofail-1080.webp 1080w"
+          sizes="(min-width: 720px) 420px, min(360px, calc(100vw - 32px))"
+          width="1080"
+          height="1260"
+          alt="صورة الأنبا روفائيل"
+          fetchpriority="high"
+        />
+      </figure>
+
+      <!-- Registration form -->
+      <section id="register-section" class="card" aria-labelledby="register-title">
+        <h2 id="register-title" class="section-title">التسجيل في الاجتماع</h2>
+        <hr class="ember-rule" />
+
+        <div id="form-alert" class="alert" role="alert" hidden></div>
+
+        <form id="register-form" novalidate>
+          <div class="field">
+            <label for="full_name">الاسم بالكامل</label>
+            <input id="full_name" name="full_name" type="text" autocomplete="name" maxlength="100" required />
+            <p class="field-error" id="full_name-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="phone">رقم الموبايل</label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel"
+              placeholder="01xxxxxxxxx"
+              maxlength="20"
+              required
+            />
+            <p class="field-error" id="phone-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="faculty">الكلية</label>
+            <input id="faculty" name="faculty" type="text" maxlength="100" required />
+            <p class="field-error" id="faculty-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="university">الجامعة</label>
+            <input id="university" name="university" type="text" maxlength="100" required />
+            <p class="field-error" id="university-error" hidden></p>
+          </div>
+
+          <div class="hp" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <button id="submit-btn" class="btn btn-block" type="submit">
+            <span class="spinner" hidden></span>
+            <span class="btn-label">سجّل</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Status card (returning member / after registering) -->
+      <section id="status-section" class="card status-card" aria-live="polite" hidden>
+        <div id="status-loading" class="loading">
+          <span class="spinner"></span>
+          <span>بنحمّل حالتك…</span>
+        </div>
+
+        <div id="status-error" hidden>
+          <div class="alert" role="alert">مقدرناش نحمّل حالتك دلوقتي. اتأكد من النت وحاول تاني.</div>
+          <button id="status-retry" class="btn btn-ghost" type="button">حاول تاني</button>
+        </div>
+
+        <div id="status-body" hidden>
+          <p class="member-name" id="member-name"></p>
+
+          <div id="status-confirmed" hidden>
+            <span class="confirmed-label">مؤكد</span>
+            <div>
+              <span class="attendance-number" id="attendance-number"></span>
+            </div>
+            <p class="number-caption">رقم الحضور بتاعك — وريه على الباب</p>
+          </div>
+
+          <div id="status-waiting" hidden>
+            <span class="waiting-badge">قائمة الانتظار</span>
+            <p class="waiting-position" id="waiting-position"></p>
+            <p class="status-note">ارجع للصفحة دي تاني بعدين — لو فيه أماكن فضيت هتتنقل للمؤكدين تلقائيًا.</p>
+            <button id="status-refresh" class="btn btn-ghost" type="button">تحديث الحالة</button>
+          </div>
+
+          <p class="device-note">حالتك محفوظة على المتصفح ده بس — احتفظ بالصفحة أو خد سكرين شوت.</p>
+          <p class="device-note" id="storage-warning" hidden>
+            تنبيه: المتصفح ده مش بيسمح بحفظ الحالة (ممكن يكون وضع التصفح الخفي). خد سكرين شوت دلوقتي.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

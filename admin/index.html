@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>لوحة التحكم — فيلو فاميلي</title>
+    <meta name="theme-color" content="#241C17" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
+    <script type="module" src="/src/admin/main.ts"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <img src="/brand/logo-80.webp" width="40" height="40" alt="شعار فيلو فاميلي" />
+        <span>لوحة التحكم</span>
+      </div>
+      <button id="logout-btn" class="btn btn-ghost btn-small" type="button" hidden>تسجيل خروج</button>
+    </header>
+
+    <main class="admin-page">
+      <!-- Login -->
+      <section id="login-section" class="card login-card" hidden>
+        <h1 class="section-title">تسجيل دخول المسؤولين</h1>
+        <div id="login-alert" class="alert" role="alert" hidden></div>
+        <form id="login-form">
+          <div class="field">
+            <label for="email">البريد الإلكتروني</label>
+            <input id="email" name="email" type="email" autocomplete="username" dir="ltr" required />
+          </div>
+          <div class="field">
+            <label for="password">كلمة السر</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" dir="ltr" required />
+          </div>
+          <button id="login-btn" class="btn btn-block" type="submit">
+            <span class="spinner" hidden></span>
+            <span class="btn-label">دخول</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="dashboard-section" hidden>
+        <div id="dash-alert" class="alert" role="alert" hidden></div>
+
+        <div class="counters">
+          <div class="card counter">
+            <span class="counter-label">المؤكدين / السعة</span>
+            <span class="counter-value"><span id="count-confirmed">–</span> / <span id="count-capacity">–</span></span>
+          </div>
+          <div class="card counter">
+            <span class="counter-label">قائمة الانتظار</span>
+            <span class="counter-value" id="count-waiting">–</span>
+          </div>
+          <div class="card counter">
+            <span class="counter-label">الإجمالي</span>
+            <span class="counter-value" id="count-total">–</span>
+          </div>
+        </div>
+
+        <form id="capacity-form" class="card capacity-form">
+          <label for="capacity">السعة</label>
+          <div class="capacity-row">
+            <input id="capacity" name="capacity" type="number" inputmode="numeric" min="1" step="1" dir="ltr" required />
+            <button id="capacity-btn" class="btn" type="submit">حفظ</button>
+          </div>
+          <p id="capacity-result" class="capacity-result" role="status" hidden></p>
+        </form>
+
+        <div class="card">
+          <div class="table-tools">
+            <div class="field">
+              <label for="status-filter">الحالة</label>
+              <select id="status-filter">
+                <option value="all">الكل</option>
+                <option value="confirmed">مؤكد</option>
+                <option value="waiting">انتظار</option>
+              </select>
+            </div>
+            <div class="field grow">
+              <label for="search">بحث بالاسم أو الموبايل</label>
+              <input id="search" type="search" autocomplete="off" />
+            </div>
+          </div>
+          <p class="muted table-meta">
+            <span id="shown-count"></span>
+            <span id="last-updated"></span>
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم الحضور</th>
+                  <th>الاسم</th>
+                  <th>الموبايل</th>
+                  <th>الكلية</th>
+                  <th>الجامعة</th>
+                  <th>الحالة</th>
+                  <th>ترتيب الانتظار</th>
+                  <th>وقت التسجيل</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -154,6 +154,62 @@ describe('set_capacity', () => {
   });
 });
 
+describe('delete_registration', () => {
+  beforeEach(() => setup(2));
+
+  const del = (id: number, uid = ADMIN) =>
+    asRole<{ result: string; promoted: { attendanceNumber: number } | null }>(
+      db, 'authenticated', 'select public.delete_registration($1)', [id], { uid });
+
+  it('deleting a confirmed row promotes the first waiting with the next number', async () => {
+    const all: RegisterResult[] = [];
+    for (let i = 0; i < 4; i++) all.push(await register(db));
+    const before = await dashboard();
+    const first = before.registrations.find((r) => r.attendanceNumber === 1) as unknown as { id: number };
+
+    const res = await del(first.id);
+    expect(res.result).toBe('ok');
+    expect(res.promoted!.attendanceNumber).toBe(3);
+    expect(await lookup(all[0].token!)).toBeNull();
+    expect(await lookup(all[2].token!)).toMatchObject({ status: 'confirmed', attendanceNumber: 3 });
+    expect(await lookup(all[3].token!)).toMatchObject({ status: 'waiting', waitingPosition: 1 });
+
+    const d = await dashboard();
+    expect([d.confirmed, d.waiting, d.total]).toEqual([2, 1, 3]);
+    expect((await register(db)).waitingPosition).toBe(2);
+    expect(await del(first.id)).toMatchObject({ result: 'not_found' });
+  });
+
+  it('deleting a waiting row promotes nobody', async () => {
+    for (let i = 0; i < 3; i++) await register(db);
+    const waiting = (await dashboard()).registrations.find((r) => r.status === 'waiting') as unknown as { id: number };
+    expect(await del(waiting.id)).toMatchObject({ result: 'ok', promoted: null });
+    const d = await dashboard();
+    expect([d.confirmed, d.waiting, d.total]).toEqual([2, 0, 2]);
+  });
+
+  it('a member can cancel with their token; the seat goes to the first waiting', async () => {
+    const all: RegisterResult[] = [];
+    for (let i = 0; i < 3; i++) all.push(await register(db));
+    const cancel = (token: string) =>
+      asRole<{ result: string }>(db, 'anon', 'select public.cancel_my_registration($1)', [token]);
+
+    expect(await cancel(all[1].token!)).toEqual({ result: 'ok' });
+    expect(await lookup(all[1].token!)).toBeNull();
+    expect(await lookup(all[2].token!)).toMatchObject({ status: 'confirmed', attendanceNumber: 3 });
+    expect(await cancel(all[1].token!)).toEqual({ result: 'not_found' });
+    expect(await cancel('not-a-token')).toEqual({ result: 'not_found' });
+    expect((await dashboard()).total).toBe(2);
+  });
+
+  it('rejects anon and non-admin users', async () => {
+    await register(db);
+    await expect(asRole(db, 'anon', 'select public.delete_registration(1)')).rejects.toThrow(/permission denied/);
+    await expect(asRole(db, 'anon', 'select private.remove_registration(1)')).rejects.toThrow(/permission denied/);
+    await expect(del(1, NOT_ADMIN)).rejects.toThrow(/not authorized/);
+  });
+});
+
 describe('admin access', () => {
   beforeEach(() => setup(200));
 

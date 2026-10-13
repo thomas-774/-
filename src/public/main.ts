@@ -2,7 +2,7 @@
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/public.css';
-import { getMyRegistration, registerMember, type Registration } from './api';
+import { cancelMyRegistration, getMyRegistration, registerMember, type Registration } from './api';
 import { cleanText, validateRegistration, type Field } from '../shared/phone';
 
 const TOKEN_KEY = 'filo_reg_token';
@@ -26,6 +26,9 @@ const form = $<HTMLFormElement>('register-form');
 const formAlert = $('form-alert');
 const submitBtn = $<HTMLButtonElement>('submit-btn');
 const statusSection = $('status-section');
+
+// In-memory copy of the token, for browsers that refuse localStorage
+let lastToken: string | null = null;
 
 // ---------- localStorage (may throw in private modes) ----------
 function loadToken(): string | null {
@@ -89,6 +92,7 @@ function renderStatus(reg: Registration, storageOk = true): void {
     $('waiting-position').textContent = `#${reg.waitingPosition}`;
   }
   $('storage-warning').hidden = storageOk;
+  $('cancel-alert').hidden = true;
   showStatusPart('body');
 }
 
@@ -102,6 +106,7 @@ async function loadStatus(token: string): Promise<void> {
       showForm();
       return;
     }
+    lastToken = token;
     renderStatus(reg);
   } catch {
     showStatusPart('error');
@@ -117,6 +122,34 @@ $('status-retry').addEventListener('click', () => {
 $('status-refresh').addEventListener('click', () => {
   const token = loadToken();
   if (token) void loadStatus(token);
+});
+
+// ---------- Cancel ----------
+const cancelBtn = $<HTMLButtonElement>('cancel-btn');
+const cancelAlert = $('cancel-alert');
+
+cancelBtn.addEventListener('click', async () => {
+  const token = loadToken() ?? lastToken;
+  if (!token) return;
+  if (!window.confirm('متأكد إنك عايز تلغي تسجيلك؟ لو كان ليك رقم حضور هيروح لحد تاني ومش هيرجعلك.')) return;
+
+  cancelAlert.hidden = true;
+  cancelBtn.disabled = true;
+  cancelBtn.querySelector<HTMLElement>('.spinner')!.hidden = false;
+  try {
+    await cancelMyRegistration(token);
+    clearToken();
+    lastToken = null;
+    form.reset();
+    showForm();
+    setAlert('اتلغى تسجيلك.');
+  } catch {
+    cancelAlert.textContent = MSG_BUSY;
+    cancelAlert.hidden = false;
+  } finally {
+    cancelBtn.disabled = false;
+    cancelBtn.querySelector<HTMLElement>('.spinner')!.hidden = true;
+  }
 });
 
 // ---------- Registration form ----------
@@ -192,6 +225,7 @@ form.addEventListener('submit', async (event) => {
 
     switch (res.result) {
       case 'ok': {
+        lastToken = res.token;
         const stored = saveToken(res.token);
         renderStatus(res, stored);
         window.scrollTo({ top: statusSection.offsetTop - 16 });

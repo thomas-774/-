@@ -1,4 +1,4 @@
-// Plain-fetch wrappers for the two public RPCs. No supabase-js on the public page (plan §7b).
+// Plain-fetch wrappers for the public RPCs. No supabase-js on the public page (plan §7b).
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../shared/config';
 
 export type Status = 'confirmed' | 'waiting';
@@ -62,7 +62,7 @@ async function rpcOnce<T>(fn: string, body: unknown): Promise<T> {
   return (await res.json()) as T;
 }
 
-/** Up to 3 retries with 1 s / 2 s / 4 s back-off. Safe because both RPCs are idempotent. */
+/** Up to 3 retries with 1 s / 2 s / 4 s back-off. Safe because every RPC is idempotent. */
 async function rpc<T>(fn: string, body: unknown): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
@@ -76,6 +76,11 @@ async function rpc<T>(fn: string, body: unknown): Promise<T> {
 
 export function registerMember(params: RegisterParams): Promise<RegisterResponse> {
   return rpc<RegisterResponse>('register_member', params);
+}
+
+/** 'not_found' after a retried success is fine: the registration is gone either way. */
+export function cancelMyRegistration(token: string): Promise<{ result: 'ok' | 'not_found' }> {
+  return rpc<{ result: 'ok' | 'not_found' }>('cancel_my_registration', { p_token: token });
 }
 
 export function getMyRegistration(token: string): Promise<Registration | null> {

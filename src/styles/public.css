@@ -186,3 +186,9 @@
 .has-token #status-section[hidden] {
   display: block !important;
 }
+
+.cancel-area {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}

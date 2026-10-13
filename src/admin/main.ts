@@ -32,6 +32,10 @@ type CapacityResult =
   | { result: 'ok'; capacity: number; promotedCount: number; promoted: { attendanceNumber: number }[] }
   | { result: 'invalid'; reason: 'below_confirmed' | 'out_of_range'; confirmed?: number };
 
+type DeleteResult =
+  | { result: 'ok'; deletedId: number; promoted: { id: number; fullName: string; attendanceNumber: number } | null }
+  | { result: 'not_found' };
+
 const POLL_MS = 15_000;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -178,13 +182,21 @@ function render(): void {
       cell(r.waitingPosition != null ? `#${r.waitingPosition}` : '—'),
       cell(dateFmt.format(new Date(r.createdAt))),
     );
+    const actionTd = document.createElement('td');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'btn btn-danger btn-tiny';
+    deleteBtn.textContent = 'حذف';
+    deleteBtn.addEventListener('click', () => void deleteRow(r, deleteBtn));
+    actionTd.append(deleteBtn);
+    tr.append(actionTd);
     frag.append(tr);
   }
   if (rows.length === 0) {
     const tr = document.createElement('tr');
     tr.className = 'empty-row';
     const td = cell(data.total === 0 ? 'لسه مفيش تسجيلات.' : 'مفيش نتايج.');
-    td.colSpan = 8;
+    td.colSpan = 9;
     tr.append(td);
     frag.append(tr);
   }
@@ -196,6 +208,39 @@ function render(): void {
 
 statusFilter.addEventListener('change', render);
 searchInput.addEventListener('input', render);
+
+// ---------- Delete ----------
+async function deleteRow(row: Row, btn: HTMLButtonElement): Promise<void> {
+  const label = row.attendanceNumber != null ? `رقم ${row.attendanceNumber}` : 'من قائمة الانتظار';
+  if (!window.confirm(`متأكد إنك عايز تحذف تسجيل "${row.fullName}" (${label})؟ مينفعش التراجع.`)) return;
+
+  btn.disabled = true;
+  const { data: res, error } = await supabase.rpc('delete_registration', { p_id: row.id });
+
+  if (error) {
+    btn.disabled = false;
+    if (isNotAdmin(error)) {
+      await supabase.auth.signOut();
+      showLogin('الحساب ده مش من حسابات المسؤولين.');
+      return;
+    }
+    show(dashAlert, 'حصلت مشكلة ومتحذفش التسجيل. حاول تاني.');
+    return;
+  }
+
+  const result = res as DeleteResult;
+  await refresh();
+  if (result.result === 'not_found') {
+    show(dashAlert, 'التسجيل ده اتحذف قبل كده.');
+  } else if (result.promoted) {
+    show(
+      dashAlert,
+      `اتحذف "${row.fullName}" — واتنقل "${result.promoted.fullName}" من الانتظار برقم ${result.promoted.attendanceNumber}.`,
+    );
+  } else {
+    show(dashAlert, `اتحذف "${row.fullName}".`);
+  }
+}
 
 // ---------- Capacity ----------
 capacityInput.addEventListener('input', () => {

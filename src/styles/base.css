@@ -131,6 +131,13 @@ input[type='tel'] {
   font-weight: 600;
 }
 
+.btn-danger {
+  background: transparent;
+  color: var(--error);
+  border: 1px solid var(--error);
+  font-weight: 600;
+}
+
 .spinner {
   width: 20px;
   height: 20px;

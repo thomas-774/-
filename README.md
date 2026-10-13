@@ -33,10 +33,11 @@ VITE_SUPABASE_ANON_KEY=<anon or publishable key>
 
 1. Create a project at [supabase.com](https://supabase.com). Choose region **Frankfurt (eu-central-1)**.
 2. **Authentication → Sign In / Providers → Email:** keep email login on. Turn **"Allow new users to sign up" OFF.**
-3. **SQL Editor:** run the three files in order:
+3. **SQL Editor:** run the files in order:
    1. `supabase/migrations/001_schema.sql`
    2. `supabase/migrations/002_functions.sql`
    3. `supabase/migrations/003_permissions.sql`
+   4. `supabase/migrations/004_delete_registration.sql`
 
    Or, with the [Supabase CLI](https://supabase.com/docs/guides/cli): `supabase link --project-ref <ref>` then `supabase db push`.
 4. **Project Settings → API:** make sure **Exposed schemas** contains only `public` (and `graphql_public` if it is there by default). **Never add `private`.**
